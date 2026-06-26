@@ -1,0 +1,31 @@
+{
+  "name": "AI Honeycomb Inspector Professional",
+  "short_name": "HCI Pro",
+  "description": "AI-powered concrete surface inspection platform for real-time honeycomb defect detection and professional engineering report generation.",
+  "version": "5.0.0",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#ffffff",
+  "theme_color": "#0066FF",
+  "lang": "en",
+  "scope": "./",
+  "categories": ["engineering", "productivity", "utilities"],
+  "icons": [
+    {
+      "src": "assets/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "assets/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [],
+  "related_applications": [],
+  "prefer_related_applications": false
+}

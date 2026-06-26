@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>AI Honeycomb Inspector v5 Professional</title>
+
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.json" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="HCI Pro" />
+  <meta name="theme-color" content="#0066FF" />
+  <meta name="application-name" content="AI Honeycomb Inspector Professional" />
+  <meta name="description" content="AI-powered concrete surface inspection — real-time honeycomb defect detection and professional engineering reports." />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/main.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script>
+    // Load ONNX Runtime
+    const onnxScript = document.createElement('script');
+    onnxScript.src = 'https://cdn.jsdelivr.net/npm/onnxruntime-web@1.17.1/dist/ort.min.js';
+    document.head.appendChild(onnxScript);
+  </script>
+</head>
+<body>
+
+  <!-- ═══════════════════════════════════════════ HOME SCREEN ═══ -->
+  <div id="screen-home" class="screen active">
+    <div class="home-bg"></div>
+    <div class="home-container">
+      <header class="home-header">
+        <div class="brand-logo">
+          <div class="logo-icon">
+            <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M24 4L40 13V31L24 40L8 31V13L24 4Z" fill="url(#logoGrad)" opacity="0.9"/>
+              <path d="M24 10L36 17V29L24 36L12 29V17L24 10Z" fill="white" opacity="0.2"/>
+              <path d="M24 16L32 21V27L24 32L16 27V21L24 16Z" fill="white" opacity="0.9"/>
+              <defs>
+                <linearGradient id="logoGrad" x1="8" y1="4" x2="40" y2="40" gradientUnits="userSpaceOnUse">
+                  <stop stop-color="#0066FF"/>
+                  <stop offset="1" stop-color="#0033CC"/>
+                </linearGradient>
+              </defs>
+            </svg>
+          </div>
+          <div class="brand-text">
+            <span class="brand-name">Honeycomb Inspector</span>
+            <span class="brand-version">v5 Professional</span>
+          </div>
+        </div>
+        <button class="icon-btn" id="btn-settings-home" title="Settings">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        </button>
+      </header>
+
+      <div class="home-hero">
+        <h1 class="hero-title">AI-Powered<br>Concrete Inspection</h1>
+        <p class="hero-subtitle">Real-time honeycomb defect detection with professional engineering reporting</p>
+      </div>
+
+      <div class="status-grid">
+        <div class="status-card" id="status-ai">
+          <div class="status-card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/><circle cx="12" cy="10" r="3"/></svg>
+          </div>
+          <div class="status-card-content">
+            <span class="status-label">AI Model</span>
+            <span class="status-value" id="ai-model-status">Loading…</span>
+          </div>
+          <div class="status-dot" id="ai-dot"></div>
+        </div>
+        <div class="status-card" id="status-cam">
+          <div class="status-card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+          </div>
+          <div class="status-card-content">
+            <span class="status-label">Camera</span>
+            <span class="status-value" id="camera-status">Not Connected</span>
+          </div>
+          <div class="status-dot" id="cam-dot"></div>
+        </div>
+      </div>
+
+      <div class="home-actions">
+        <button class="btn-primary btn-xl" id="btn-start-inspection">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8" fill="currentColor" stroke="none"/></svg>
+          Start Inspection
+        </button>
+        <div class="secondary-actions">
+          <button class="btn-secondary" id="btn-history">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.51"/></svg>
+            History
+          </button>
+          <button class="btn-secondary" id="btn-about">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            About
+          </button>
+        </div>
+      </div>
+
+      <footer class="home-footer">
+        <span>Construction Intelligence Laboratory (CI-Lab)</span>
+        <span class="footer-sep">·</span>
+        <span id="app-version">Version 5.0 Professional</span>
+      </footer>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════ INSPECTION SCREEN ════ -->
+  <div id="screen-inspection" class="screen">
+    <!-- Status Bar -->
+    <div class="insp-statusbar">
+      <div class="insp-status-item">
+        <span class="insp-status-dot" id="insp-ai-dot"></span>
+        <span id="insp-ai-label">AI Ready</span>
+      </div>
+      <div class="insp-status-item">
+        <span class="insp-status-icon">⚡</span>
+        <span id="insp-fps">0 FPS</span>
+      </div>
+      <div class="insp-status-item">
+        <span class="insp-status-icon">📷</span>
+        <span id="insp-resolution">—</span>
+      </div>
+      <div class="insp-status-item">
+        <span class="insp-status-icon">🔍</span>
+        <span id="insp-det-count">0 Found</span>
+      </div>
+      <div class="insp-status-item">
+        <span class="insp-status-icon">⏱</span>
+        <span id="insp-elapsed">00:00</span>
+      </div>
+    </div>
+
+    <!-- Viewport -->
+    <div class="viewport-wrapper">
+      <video id="camera-video" autoplay playsinline muted></video>
+      <canvas id="detection-canvas"></canvas>
+      <div class="viewport-overlay" id="viewport-overlay">
+        <div class="viewport-corner tl"></div>
+        <div class="viewport-corner tr"></div>
+        <div class="viewport-corner bl"></div>
+        <div class="viewport-corner br"></div>
+        <div class="no-camera-msg" id="no-camera-msg">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+          <span>Camera not available</span>
+        </div>
+      </div>
+      <!-- Detection info overlay -->
+      <div class="det-live-badge" id="det-live-badge" style="display:none">
+        <div class="det-badge-row"><span class="det-badge-label">Detections</span><span id="badge-count" class="det-badge-val">0</span></div>
+        <div class="det-badge-row"><span class="det-badge-label">Max Area</span><span id="badge-area" class="det-badge-val">—</span></div>
+        <div class="det-badge-row"><span class="det-badge-label">Severity</span><span id="badge-sev" class="det-badge-val">—</span></div>
+      </div>
+    </div>
+
+    <!-- Captured Thumbnails Strip -->
+    <div class="capture-strip" id="capture-strip">
+      <div class="capture-strip-empty" id="capture-empty">No captures yet — tap 📸 to capture</div>
+    </div>
+
+    <!-- Toolbar -->
+    <div class="insp-toolbar">
+      <button class="tool-btn" id="btn-back-home" title="Back">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+        <span>Back</span>
+      </button>
+      <button class="tool-btn" id="btn-freeze" title="Freeze">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg>
+        <span>Freeze</span>
+      </button>
+      <button class="tool-btn" id="btn-overlay" title="Toggle Overlay">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        <span>Overlay</span>
+      </button>
+      <button class="tool-btn tool-btn-primary" id="btn-capture" title="Capture">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="4"/><path d="M20.94 11A8.994 8.994 0 0 0 12 3.06M3.06 11a8.994 8.994 0 0 0 8.94 8.94"/><path d="M9 2l3 3-3 3"/></svg>
+        <span>Capture</span>
+      </button>
+      <button class="tool-btn tool-btn-accent" id="btn-open-report-form" title="Report" disabled>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+        <span>Report</span>
+      </button>
+      <button class="tool-btn tool-btn-danger" id="btn-reset" title="Reset">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.51"/></svg>
+        <span>Reset</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════ REPORT INFO FORM MODAL ═══ -->
+  <div id="modal-report-form" class="modal-overlay" style="display:none">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <div class="modal-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          </div>
+          <div>
+            <h2 class="modal-title">Inspection Report</h2>
+            <p class="modal-subtitle">Enter project information before generating</p>
+          </div>
+        </div>
+        <button class="icon-btn modal-close" id="btn-close-form">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="form-grid">
+          <div class="form-group form-group-full">
+            <label class="form-label">Project Name *</label>
+            <input class="form-input" id="f-project" type="text" placeholder="e.g. Residential Tower Block A" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Subject</label>
+            <input class="form-input" id="f-subject" type="text" placeholder="e.g. Column Inspection" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Location</label>
+            <input class="form-input" id="f-location" type="text" placeholder="e.g. Bangkok, Thailand" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Structural Type</label>
+            <select class="form-input form-select" id="f-struct-type">
+              <option value="">Select type…</option>
+              <option>Column</option>
+              <option>Beam</option>
+              <option>Slab</option>
+              <option>Wall</option>
+              <option>Foundation</option>
+              <option>Pile</option>
+              <option>Bridge Pier</option>
+              <option>Retaining Wall</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Structural Name / ID</label>
+            <input class="form-input" id="f-struct-id" type="text" placeholder="e.g. C-03, B-12" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Inspector Name</label>
+            <input class="form-input" id="f-inspector" type="text" placeholder="Full name" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Company / Organization</label>
+            <input class="form-input" id="f-company" type="text" placeholder="Company name" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Weather Conditions</label>
+            <select class="form-input form-select" id="f-weather">
+              <option value="">Select…</option>
+              <option>Sunny</option>
+              <option>Cloudy</option>
+              <option>Overcast</option>
+              <option>Rainy</option>
+              <option>Indoor / Covered</option>
+            </select>
+          </div>
+          <div class="form-group form-group-full">
+            <label class="form-label">Remarks / Notes</label>
+            <textarea class="form-input form-textarea" id="f-remark" placeholder="Additional observations or context…"></textarea>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" id="btn-cancel-form">Cancel</button>
+        <button class="btn-primary" id="btn-generate-report">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+          Generate Report
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════ REPORT SCREEN ══════ -->
+  <div id="screen-report" class="screen">
+    <div class="report-topbar">
+      <button class="btn-secondary btn-sm" id="btn-back-inspection">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+        Inspection
+      </button>
+      <span class="report-topbar-title">Inspection Report</span>
+      <button class="btn-primary btn-sm" id="btn-export-pdf">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Export PDF
+      </button>
+    </div>
+    <div class="report-scroll-area">
+      <div id="report-content">
+        <!-- Dynamically generated -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ HISTORY SCREEN ════ -->
+  <div id="screen-history" class="screen">
+    <div class="report-topbar">
+      <button class="btn-secondary btn-sm" id="btn-back-home-hist">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+        Home
+      </button>
+      <span class="report-topbar-title">Inspection History</span>
+      <button class="btn-secondary btn-sm" id="btn-clear-history">Clear All</button>
+    </div>
+    <div class="history-list" id="history-list">
+      <div class="empty-state">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.51"/></svg>
+        <p>No inspection history yet.</p>
+        <p class="empty-sub">Completed inspections will appear here.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════ ABOUT MODAL ════════ -->
+  <div id="modal-about" class="modal-overlay" style="display:none">
+    <div class="modal-card modal-card-sm">
+      <div class="modal-header">
+        <h2 class="modal-title">About</h2>
+        <button class="icon-btn modal-close" id="btn-close-about">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="modal-body about-body">
+        <div class="about-logo">
+          <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" width="56" height="56">
+            <path d="M24 4L40 13V31L24 40L8 31V13L24 4Z" fill="url(#aboutLogoGrad)" opacity="0.9"/>
+            <path d="M24 16L32 21V27L24 32L16 27V21L24 16Z" fill="white" opacity="0.9"/>
+            <defs><linearGradient id="aboutLogoGrad" x1="8" y1="4" x2="40" y2="40" gradientUnits="userSpaceOnUse"><stop stop-color="#0066FF"/><stop offset="1" stop-color="#0033CC"/></linearGradient></defs>
+          </svg>
+        </div>
+        <h3>AI Honeycomb Inspector</h3>
+        <p class="about-version">Version 5.0 Professional</p>
+        <div class="about-info">
+          <p>An AI-powered concrete surface inspection platform for real-time honeycomb defect detection and professional engineering report generation.</p>
+          <p>Uses YOLOv8 object detection with ONNX Runtime Web for on-device inference.</p>
+        </div>
+        <div class="about-org">Construction Intelligence Laboratory (CI-Lab)</div>
+      </div>
+      <div class="modal-footer modal-footer-center">
+        <button class="btn-primary" id="btn-close-about-btn">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ TOAST ════════════ -->
+  <div id="toast-container"></div>
+
+  <!-- ══════════════════════════════════════ LOADING ════════════ -->
+  <div id="loading-overlay" class="loading-overlay" style="display:none">
+    <div class="loading-card">
+      <div class="loading-spinner"></div>
+      <span id="loading-msg">Loading…</span>
+    </div>
+  </div>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
